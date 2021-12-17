@@ -68,7 +68,7 @@ namespace Model {
                 row.forEach((value, x) => {
                     if (value == row[x + 1]) {
                         comboV++;
-                        saveVAry.push(x);
+                        // saveVAry.push(x);
                         saveVAry.push(x + 1);
 
                         if (comboV >= minCombo) {
@@ -83,6 +83,8 @@ namespace Model {
 
                             });
                         }
+                        console.log(saveVAry.length);
+
                     } else {
                         comboV = 1;
                         saveVAry = [];
@@ -122,13 +124,8 @@ namespace Model {
             }
             for (let i: number = 0; i < 8; i++) {
 
-                // console.log(i);
-                // let y=i;
-                // this.emit('sentPosition', { y, x });
-                // this.emit('sentPosition', { x, y });
                 board[x].splice(i, 1, this._block.ranNum());
             }
-            // console.table(board);
             return board;
         }
 

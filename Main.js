@@ -247,9 +247,9 @@ var View;
             this._state();
         }
         upDate() {
-            if (this._controller.checkBoard(this._board)) {
-                this.clearBard();
-            }
+            // if (this._controller.checkBoard(this._board)) {
+            //     this.clearBard();
+            // }
             this.aim_ani(this._aim);
             this.clearHB();
         }
@@ -328,9 +328,11 @@ var View;
                         this._app.stage.addChild(block);
                     });
                     this.cancelTimer2();
-                    this.timer_scale = setInterval(() => {
-                        this.move(this.changBlock[0], this.changBlock[1], positionAX, positionBX, positionAY, positionBY);
-                    });
+                    if (this.changBlock.length > 1) {
+                        this.timer_scale = setInterval(() => {
+                            this.move(this.changBlock[0], this.changBlock[1], positionAX, positionBX, positionAY, positionBY);
+                        });
+                    }
                 }
                 this._board = this._controller.checkNomalBlock(this._lastBlock, block, this._board);
                 this._lastBlock = undefined;
@@ -445,7 +447,7 @@ var Model;
                 row.forEach((value, x) => {
                     if (value == row[x + 1]) {
                         comboV++;
-                        saveVAry.push(x);
+                        // saveVAry.push(x);
                         saveVAry.push(x + 1);
                         if (comboV >= minCombo) {
                             saveVAry.forEach((x) => {
@@ -456,6 +458,7 @@ var Model;
                                 row.unshift(this._block.ranNum());
                             });
                         }
+                        console.log(saveVAry.length);
                     }
                     else {
                         comboV = 1;
@@ -488,13 +491,8 @@ var Model;
                 x = Math.floor((position.x + 2.5) / 87.5);
             }
             for (let i = 0; i < 8; i++) {
-                // console.log(i);
-                // let y=i;
-                // this.emit('sentPosition', { y, x });
-                // this.emit('sentPosition', { x, y });
                 board[x].splice(i, 1, this._block.ranNum());
             }
-            // console.table(board);
             return board;
         }
         nomalBlock(last, block, board) {

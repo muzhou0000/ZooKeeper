@@ -167,9 +167,9 @@ namespace View {
 
         }
         private upDate(): void {
-            if (this._controller.checkBoard(this._board)) {
-                this.clearBard();
-            }
+            // if (this._controller.checkBoard(this._board)) {
+            //     this.clearBard();
+            // }
             this.aim_ani(this._aim);
             this.clearHB();
 
@@ -272,9 +272,13 @@ namespace View {
                     })
 
                     this.cancelTimer2();
-                    this.timer_scale = setInterval(() => {
-                        this.move(this.changBlock[0], this.changBlock[1], positionAX, positionBX, positionAY, positionBY);
-                    });
+
+                    if(this.changBlock.length>1){
+
+                        this.timer_scale = setInterval(() => {
+                            this.move(this.changBlock[0], this.changBlock[1], positionAX, positionBX, positionAY, positionBY);
+                        });
+                    }
 
                 }
 
