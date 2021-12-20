@@ -21,7 +21,6 @@ namespace Model {
             let minCombo: number = 3;
             let comboH: number = 1;
             let comboV: number = 1;
-            // let saveHAry: number[] = [];
             let saveVAry: number[] = [];
             let pointNum: number[] = [];
             
@@ -68,10 +67,13 @@ namespace Model {
                 row.forEach((value, x) => {
                     if (value == row[x + 1]) {
                         comboV++;
-                        // saveVAry.push(x);
-                        saveVAry.push(x + 1);
-
+                        
                         if (comboV >= minCombo) {
+                            for(let i:number=0;i<comboV;i++){
+                                saveVAry.push(x-1 + i);
+
+                            }
+
                             saveVAry.forEach((x: number) => {
                                 row.splice(x, 1);
 
@@ -83,7 +85,6 @@ namespace Model {
 
                             });
                         }
-                        console.log(saveVAry.length);
 
                     } else {
                         comboV = 1;

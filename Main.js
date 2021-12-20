@@ -87,60 +87,62 @@ var View;
             };
             this.move = (A, B, Ax, Bx, Ay, By) => {
                 let bol = false;
-                if (Ax < Bx && Ay == By) {
-                    bol = true;
-                    if (B.x == Ax) {
-                        bol = false;
-                        this.changBlock.forEach((e) => {
-                            this._app.stage.removeChild(e);
-                        });
-                        this.changBlock = [];
+                if (A && B) {
+                    if (Ax < Bx && Ay == By) {
+                        bol = true;
+                        if (B.x == Ax) {
+                            bol = false;
+                            this.changBlock.forEach((e) => {
+                                this._app.stage.removeChild(e);
+                            });
+                            this.changBlock = [];
+                        }
+                        if (bol) {
+                            B.x -= 1;
+                            A.x += 1;
+                        }
                     }
-                    if (bol) {
-                        B.x -= 1;
-                        A.x += 1;
+                    else if (Bx < Ax && Ay == By) {
+                        bol = true;
+                        if (B.x == Ax) {
+                            bol = false;
+                            this.changBlock.forEach((e) => {
+                                this._app.stage.removeChild(e);
+                            });
+                            this.changBlock = [];
+                        }
+                        if (bol) {
+                            B.x += 1;
+                            A.x -= 1;
+                        }
                     }
-                }
-                else if (Bx < Ax && Ay == By) {
-                    bol = true;
-                    if (B.x == Ax) {
-                        bol = false;
-                        this.changBlock.forEach((e) => {
-                            this._app.stage.removeChild(e);
-                        });
-                        this.changBlock = [];
+                    else if (Ay < By && Ax == Bx) {
+                        bol = true;
+                        if (B.y == Ay) {
+                            bol = false;
+                            this.changBlock.forEach((e) => {
+                                this._app.stage.removeChild(e);
+                            });
+                            this.changBlock = [];
+                        }
+                        if (bol) {
+                            B.y -= 1;
+                            A.y += 1;
+                        }
                     }
-                    if (bol) {
-                        B.x += 1;
-                        A.x -= 1;
-                    }
-                }
-                else if (Ay < By && Ax == Bx) {
-                    bol = true;
-                    if (B.y == Ay) {
-                        bol = false;
-                        this.changBlock.forEach((e) => {
-                            this._app.stage.removeChild(e);
-                        });
-                        this.changBlock = [];
-                    }
-                    if (bol) {
-                        B.y -= 1;
-                        A.y += 1;
-                    }
-                }
-                else if (By < Ay && Ax == Bx) {
-                    bol = true;
-                    if (B.y == Ay) {
-                        bol = false;
-                        this.changBlock.forEach((e) => {
-                            this._app.stage.removeChild(e);
-                        });
-                        this.changBlock = [];
-                    }
-                    if (bol) {
-                        B.y += 1;
-                        A.y -= 1;
+                    else if (By < Ay && Ax == Bx) {
+                        bol = true;
+                        if (B.y == Ay) {
+                            bol = false;
+                            this.changBlock.forEach((e) => {
+                                this._app.stage.removeChild(e);
+                            });
+                            this.changBlock = [];
+                        }
+                        if (bol) {
+                            B.y += 1;
+                            A.y -= 1;
+                        }
                     }
                 }
             };
@@ -407,7 +409,6 @@ var Model;
             let minCombo = 3;
             let comboH = 1;
             let comboV = 1;
-            // let saveHAry: number[] = [];
             let saveVAry = [];
             let pointNum = [];
             let positionx = [];
@@ -447,9 +448,10 @@ var Model;
                 row.forEach((value, x) => {
                     if (value == row[x + 1]) {
                         comboV++;
-                        // saveVAry.push(x);
-                        saveVAry.push(x + 1);
                         if (comboV >= minCombo) {
+                            for (let i = 0; i < comboV; i++) {
+                                saveVAry.push(x - 1 + i);
+                            }
                             saveVAry.forEach((x) => {
                                 row.splice(x, 1);
                                 this.emit('sentPosition', { x, y });
@@ -458,7 +460,6 @@ var Model;
                                 row.unshift(this._block.ranNum());
                             });
                         }
-                        console.log(saveVAry.length);
                     }
                     else {
                         comboV = 1;

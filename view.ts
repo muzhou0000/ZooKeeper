@@ -356,64 +356,68 @@ namespace View {
 
             let bol: boolean = false;
 
-            if (Ax < Bx && Ay == By) {
-                bol = true;
-                if (B.x == Ax) {
-                    bol = false;
-                    this.changBlock.forEach((e: PIXI.Graphics) => {
-                        this._app.stage.removeChild(e);
-                    });
-                    this.changBlock = [];
+            if(A&&B){
+                if (Ax < Bx && Ay == By) {
+                    bol = true;
+                    if (B.x == Ax) {
+                        bol = false;
+                        this.changBlock.forEach((e: PIXI.Graphics) => {
+                            this._app.stage.removeChild(e);
+                        });
+                        this.changBlock = [];
+                    }
+                    if (bol) {
+                        B.x -= 1;
+                        A.x += 1;
+                    }
+    
+                } else if (Bx < Ax && Ay == By) {
+                    bol = true;
+                    if (B.x == Ax) {
+                        bol = false;
+                        this.changBlock.forEach((e: PIXI.Graphics) => {
+                            this._app.stage.removeChild(e);
+                        });
+                        this.changBlock = [];
+    
+                    }
+                    if (bol) {
+                        B.x += 1;
+                        A.x -= 1;
+                    }
+    
+                } else if (Ay < By && Ax == Bx) {
+                    bol = true;
+                    if (B.y == Ay) {
+                        bol = false;
+                        this.changBlock.forEach((e: PIXI.Graphics) => {
+                            this._app.stage.removeChild(e);
+                        });
+                        this.changBlock = [];
+    
+                    }
+                    if (bol) {
+                        B.y -= 1;
+                        A.y += 1;
+                    }
+    
+                } else if (By < Ay && Ax == Bx) {
+                    bol = true;
+                    if (B.y == Ay) {
+                        bol = false;
+                        this.changBlock.forEach((e: PIXI.Graphics) => {
+                            this._app.stage.removeChild(e);
+                        });
+                        this.changBlock = [];
+    
+                    }
+                    if (bol) {
+                        B.y += 1;
+                        A.y -= 1;
+                    }
                 }
-                if (bol) {
-                    B.x -= 1;
-                    A.x += 1;
-                }
+    
 
-            } else if (Bx < Ax && Ay == By) {
-                bol = true;
-                if (B.x == Ax) {
-                    bol = false;
-                    this.changBlock.forEach((e: PIXI.Graphics) => {
-                        this._app.stage.removeChild(e);
-                    });
-                    this.changBlock = [];
-
-                }
-                if (bol) {
-                    B.x += 1;
-                    A.x -= 1;
-                }
-
-            } else if (Ay < By && Ax == Bx) {
-                bol = true;
-                if (B.y == Ay) {
-                    bol = false;
-                    this.changBlock.forEach((e: PIXI.Graphics) => {
-                        this._app.stage.removeChild(e);
-                    });
-                    this.changBlock = [];
-
-                }
-                if (bol) {
-                    B.y -= 1;
-                    A.y += 1;
-                }
-
-            } else if (By < Ay && Ax == Bx) {
-                bol = true;
-                if (B.y == Ay) {
-                    bol = false;
-                    this.changBlock.forEach((e: PIXI.Graphics) => {
-                        this._app.stage.removeChild(e);
-                    });
-                    this.changBlock = [];
-
-                }
-                if (bol) {
-                    B.y += 1;
-                    A.y -= 1;
-                }
             }
         }
     }
