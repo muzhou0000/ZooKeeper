@@ -27,8 +27,8 @@ var Block;
             this.randomNum = 0;
         }
         ranNum() {
-            // this.randomNum=Math.floor(Math.random() * 64)>1?this.randomNum = Math.floor(Math.random() * 7) + 1:0;
-            this.randomNum = Math.floor(Math.random() * 7) + 1;
+            this.randomNum = Math.floor(Math.random() * 64) > 1 ? this.randomNum = Math.floor(Math.random() * 7) + 1 : 0;
+            // this.randomNum = Math.floor(Math.random() * 7) + 1;
             return this.randomNum;
         }
         // public createBlock(x: number, y: number, color: any): PIXI.Graphics {
@@ -75,12 +75,11 @@ var View;
             this.clearHB = () => {
                 this.clearHblock.forEach((e) => {
                     e.alpha -= 0.015;
-                    if (e.height <= 0) {
+                    if (e.alpha <= 0) {
                         this.cancelHB();
                         this.clearHblock.forEach((e) => {
                             this._app.stage.removeChild(e);
                         });
-                        e.height = 105;
                         this.clearHblock = [];
                     }
                 });
@@ -492,6 +491,7 @@ var Model;
                 x = Math.floor((position.x + 2.5) / 87.5);
             }
             for (let i = 0; i < 8; i++) {
+                this.emit('sentPosition', { x: i, y: x });
                 board[x].splice(i, 1, this._block.ranNum());
             }
             return board;

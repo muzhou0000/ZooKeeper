@@ -341,12 +341,11 @@ namespace View {
             this.clearHblock.forEach((e: PIXI.Graphics) => {
 
                 e.alpha -= 0.015;
-                if (e.height <= 0) {
+                if (e.alpha <= 0) {
                     this.cancelHB();
                     this.clearHblock.forEach((e: PIXI.Graphics) => {
                         this._app.stage.removeChild(e);
                     })
-                    e.height = 105;
                     this.clearHblock = [];
 
                 }

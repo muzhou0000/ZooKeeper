@@ -125,6 +125,7 @@ namespace Model {
             }
             for (let i: number = 0; i < 8; i++) {
 
+                this.emit('sentPosition', { x:i, y:x });
                 board[x].splice(i, 1, this._block.ranNum());
             }
             return board;
