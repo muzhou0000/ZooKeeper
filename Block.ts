@@ -29,14 +29,13 @@ namespace Block {
 
         public ranNum(): number {
 
-            this.randomNum=Math.floor(Math.random() * 64)>1?this.randomNum = Math.floor(Math.random() * 7) + 1:0;
+            // this.randomNum=Math.floor(Math.random() * 64)>1?this.randomNum = Math.floor(Math.random() * 7) + 1:0;
 
-            // this.randomNum = Math.floor(Math.random() * 7) + 1;
+            this.randomNum = Math.floor(Math.random() * 7) + 1;
             return this.randomNum;
 
         }
 
-        // public createBlock(x: number, y: number, color: any): PIXI.Graphics {
         public createBlock(x: number, y: number, color: any, id: string): PIXI.Graphics {
 
             let block: PIXI.Graphics = new PIXI.Graphics;

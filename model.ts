@@ -17,19 +17,19 @@ namespace Model {
 
         public checkBlock(board: number[][]): boolean {
             let isRemove: boolean = false
-            
+
             let minCombo: number = 3;
             let comboH: number = 1;
             let comboV: number = 1;
             let saveVAry: number[] = [];
             let pointNum: number[] = [];
-            
+
             let positionx: number[] = [];
             let positionY: number[] = [];
-            
-            
+
+
             //判斷橫向的 把原本的陣列xy互換
-            
+
             let transAry: number[][] = [];
             for (let i: number = 0; i < 8; i++) {
                 transAry.push([]);
@@ -42,9 +42,10 @@ namespace Model {
                 row.forEach((value: number, x: number) => {
                     if (value == row[x + 1]) {
                         comboH++;
+                        // console.log(positionx);
                         if (comboH >= minCombo) {
                             positionx.push(y);
-                            positionY.push(x);
+                            positionY.push(x - 1);
                             pointNum.splice(0, 3, value);
                             isRemove = true;
                         }
@@ -53,62 +54,86 @@ namespace Model {
                     }
                 })
             })
-
             //找完之後再轉回去判斷直的
-
             for (let i: number = 0; i < 8; i++) {
                 for (let j: number = 0; j < 8; j++) {
                     board[i][j] = transAry[j][i];
                 }
             }
 
+            //刪掉橫向的
+            // console.log(positionx, positionY);
+            let y: number[] = [];
+            for (let i: number = 0; i < positionY.length; i++) {
+                console.log(i,'i');
+                for (let j: number = 0; j < positionx.length + 2; j++) {
+
+
+                    let x = positionx[i];
+                    y.push(positionY[i] + j);
+
+                    let result: number[] = [...(new Set(y))];
+                    
+                    x = x > 7 ? 7 : x;
+                    if (result.length == positionx.length + 2) {
+
+                        result.forEach((num: number) => {
+                            console.log(result)
+                            // console.log(num,'num')
+                            console.log(x);
+                            num = num > 7 ? 7 : num;
+                            this.emit('sentPosition', { x: x, y: num });
+                            board[num].splice(x, 1);
+                            //其實只要壓一個數字下來 但是因為在迴圈裡面會跑result的長度次數
+                            board[num].unshift(this._block.ranNum());
+                        })
+                        
+                    }
+
+                }
+            }
+
+
             //判斷直線的
             board.forEach((row: number[], y) => {
                 row.forEach((value, x) => {
                     if (value == row[x + 1]) {
                         comboV++;
-                        
-                        if (comboV >= minCombo) {
-                            for(let i:number=0;i<comboV;i++){
-                                saveVAry.push(x-1 + i);
-
-                            }
-
-                            saveVAry.forEach((x: number) => {
-                                row.splice(x, 1);
-
-                                this.emit('sentPosition', { x, y });
-
-                                pointNum.splice(0, 3, value);
-                                isRemove = true;
-                                row.unshift(this._block.ranNum());
-
-                            });
-                        }
-
                     } else {
                         comboV = 1;
                         saveVAry = [];
                     }
+                    if (comboV >= minCombo) {
+                        // console.log(comboV, 'comboV');
+                        // console.log(x,'x');
+                        // console.log(y,'y');
+                        for (let i: number = 0; i < comboV; i++) {
+                            saveVAry.push(x - 1 + i);
+
+                        }
+                        let result: number[] = [...(new Set(saveVAry))];
+                        result.length = comboV;
+                        // console.log(result, 'savaVAry');
+
+                        result.forEach((x: number) => {
+                            x = x > 7 ? 7 : x;
+                            row.splice(x, 1);
+                            this.emit('sentPosition', { x, y });
+
+                            pointNum.splice(0, 3, value);
+                            isRemove = true;
+                            row.unshift(this._block.ranNum());
+
+                        });
+                    }
+
                 });
             });
+            // console.log(positionx, positionY);
 
-            //刪掉橫向的
-            for (let i: number = 0; i < positionY.length; i++) {
-                for (let j: number = 0; j < 3; j++) {
+            this.emit('checkBoard', board);
 
-                    let y = positionY[i] - 1 + j;
-                    let x = positionx[i];
-
-                    this.emit('sentPosition', { x, y });
-
-                    board[y].splice(x, 1);
-                    board[y].unshift(this._block.ranNum());
-                }
-            }
-            this.emit('checkBoard',board);
-
-            console.table(transAry);
+            // console.table(transAry);
             this.cul(pointNum);
             return isRemove;
         }
@@ -125,8 +150,11 @@ namespace Model {
             }
             for (let i: number = 0; i < 8; i++) {
 
-                this.emit('sentPosition', { x:i, y:x });
-                board[x].splice(i, 1, this._block.ranNum());
+
+                this.emit('sentPosition', { x: i, y: x });
+                board[x].splice(i, 1);
+                board[x].unshift(this._block.ranNum());
+
             }
             return board;
         }

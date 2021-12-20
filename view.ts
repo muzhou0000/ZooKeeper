@@ -133,6 +133,8 @@ namespace View {
 
             this._model.on('sentPosition', (e: { x: number, y: number }) => {
                 let moveBlock: PIXI.Graphics;
+                // console.log(e,'e');
+                // console.log('??',this._board[e.x][e.y])
                 moveBlock = (this._block.createBlock(0, 0, 0xffffff, this._board[e.x][e.y].toString()));
                 moveBlock.x = e.y * 100 + 102.5;
                 moveBlock.y = e.x * 100 + 207.5;
@@ -148,7 +150,7 @@ namespace View {
             })
 
             this._model.on('checkBoard',(board:number[][])=>{
-                console.log('checkboard      ========')
+                // console.log('checkboard      ========')
                 this._board=board;
             })
 
@@ -168,7 +170,7 @@ namespace View {
         }
         private upDate(): void {
             // if (this._controller.checkBoard(this._board)) {
-            //     this.clearBard();
+                // this.clearBard();
             // }
             this.aim_ani(this._aim);
             this.clearHB();
@@ -236,7 +238,7 @@ namespace View {
 
             if (block.name == '0') {
                 //消掉一整排
-                this._controller.checkSpecialBlock(block, this._board);
+                this._board=this._controller.checkSpecialBlock(block, this._board);
                 if (this._controller.checkBoard(this._board)) {
                     this.clearBard();
                 }
