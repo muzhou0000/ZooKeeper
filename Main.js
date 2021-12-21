@@ -27,8 +27,8 @@ var Block;
             this.randomNum = 0;
         }
         ranNum() {
-            this.randomNum = Math.floor(Math.random() * 100) > 1 ? this.randomNum = Math.floor(Math.random() * 7) + 1 : 0;
-            // this.randomNum = Math.floor(Math.random() * 7) + 1;
+            // this.randomNum=Math.floor(Math.random() * 100)>1?this.randomNum = Math.floor(Math.random() * 7) + 1:0;
+            this.randomNum = Math.floor(Math.random() * 7) + 1;
             return this.randomNum;
         }
         createBlock(x, y, color, id) {
@@ -480,29 +480,25 @@ var Model;
             board.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value == row[x + 1]) {
-                        ++comboV;
-                        // saveVAry.push(x + 1);
+                        comboV++;
+                        saveVAry.push(x);
                     }
                     else {
+                        if (comboV >= minCombo) {
+                            saveVAry.push(x);
+                            let result = [...(new Set(saveVAry))];
+                            console.log(result);
+                            result.forEach((x) => {
+                                x = x > 7 ? 7 : x;
+                                row.splice(x, 1);
+                                this.emit('sentPosition', { x, y });
+                                pointNum.splice(0, 3, value);
+                                isRemove = true;
+                                row.unshift(this._block.ranNum());
+                            });
+                        }
                         comboV = 1;
                         saveVAry = [];
-                    }
-                    if (comboV >= minCombo) {
-                        console.log(comboV, 'comV');
-                        for (let i = 0; i < comboV; i++) {
-                            saveVAry.push(x - 1 + i);
-                        }
-                        console.log(saveVAry);
-                        let result = [...(new Set(saveVAry))];
-                        console.log(result);
-                        result.forEach((x) => {
-                            x = x > 7 ? 7 : x;
-                            row.splice(x, 1);
-                            this.emit('sentPosition', { x, y });
-                            pointNum.splice(0, 3, value);
-                            isRemove = true;
-                            row.unshift(this._block.ranNum());
-                        });
                     }
                 });
             });

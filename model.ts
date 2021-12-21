@@ -104,34 +104,30 @@ namespace Model {
             board.forEach((row: number[], y) => {
                 row.forEach((value, x) => {
                     if (value == row[x + 1]) {
-                        ++comboV;
-                        // saveVAry.push(x + 1);
+                        comboV++;
+                        saveVAry.push(x)
                     } else {
+                        if (comboV >= minCombo) {
+                            saveVAry.push(x)
+                            let result: number[] = [...(new Set(saveVAry))];
+                            console.log(result);
+
+                            result.forEach((x: number) => {
+                                x = x > 7 ? 7 : x;
+
+                                row.splice(x, 1);
+
+                                this.emit('sentPosition', { x, y });
+
+                                pointNum.splice(0, 3, value);
+                                isRemove = true;
+                                row.unshift(this._block.ranNum());
+
+                            });
+                        }
+
                         comboV = 1;
                         saveVAry = [];
-                    }
-                    if (comboV >= minCombo) {
-                        console.log(comboV,'comV');
-                        for (let i: number = 0; i < comboV; i++) {
-                            saveVAry.push(x - 1 + i);
-
-                        }
-                        console.log(saveVAry);
-                        let result: number[] = [...(new Set(saveVAry))];
-                        console.log(result);
-
-                        result.forEach((x: number) => {
-                            x = x > 7 ? 7 : x;
-
-                            row.splice(x, 1);
-
-                            this.emit('sentPosition', { x, y });
-
-                            pointNum.splice(0, 3, value);
-                            isRemove = true;
-                            row.unshift(this._block.ranNum());
-
-                        });
                     }
 
                 });
