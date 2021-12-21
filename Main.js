@@ -27,8 +27,8 @@ var Block;
             this.randomNum = 0;
         }
         ranNum() {
-            // this.randomNum=Math.floor(Math.random() * 64)>1?this.randomNum = Math.floor(Math.random() * 7) + 1:0;
-            this.randomNum = Math.floor(Math.random() * 7) + 1;
+            this.randomNum = Math.floor(Math.random() * 100) > 1 ? this.randomNum = Math.floor(Math.random() * 7) + 1 : 0;
+            // this.randomNum = Math.floor(Math.random() * 7) + 1;
             return this.randomNum;
         }
         createBlock(x, y, color, id) {
@@ -225,6 +225,10 @@ var View;
                 let moveBlock;
                 // console.log(e,'e');
                 // console.log('??',this._board[e.x][e.y])
+                // console.log(this._board[7][7],'77');
+                if (this._board[e.x][e.y] == undefined) {
+                    this.restart();
+                }
                 moveBlock = (this._block.createBlock(0, 0, 0xffffff, this._board[e.x][e.y].toString()));
                 moveBlock.x = e.y * 100 + 102.5;
                 moveBlock.y = e.x * 100 + 207.5;
@@ -249,9 +253,9 @@ var View;
             this._state();
         }
         upDate() {
-            // if (this._controller.checkBoard(this._board)) {
-            // this.clearBard();
-            // }
+            if (this._controller.checkBoard(this._board)) {
+                this.clearBard();
+            }
             this.aim_ani(this._aim);
             this.clearHB();
         }
@@ -447,47 +451,50 @@ var Model;
             //刪掉橫向的
             // console.log(positionx, positionY);
             let y = [];
+            let x = 0;
+            let result = [];
             for (let i = 0; i < positionY.length; i++) {
-                console.log(i, 'i');
+                // console.log(i,'i');
                 for (let j = 0; j < positionx.length + 2; j++) {
-                    let x = positionx[i];
+                    x = positionx[i];
                     y.push(positionY[i] + j);
-                    let result = [...(new Set(y))];
+                    result = [...(new Set(y))];
                     x = x > 7 ? 7 : x;
-                    if (result.length == positionx.length + 2) {
-                        result.forEach((num) => {
-                            console.log(result);
-                            // console.log(num,'num')
-                            console.log(x);
-                            num = num > 7 ? 7 : num;
-                            this.emit('sentPosition', { x: x, y: num });
-                            board[num].splice(x, 1);
-                            //其實只要壓一個數字下來 但是因為在迴圈裡面會跑result的長度次數
-                            board[num].unshift(this._block.ranNum());
-                        });
-                    }
+                }
+                if (result.length == positionx.length + 2) {
+                    result.forEach((num) => {
+                        // console.log(result)
+                        // console.log(num,'num')
+                        // console.log(x);
+                        num = num > 7 ? 7 : num;
+                        this.emit('sentPosition', { x: x, y: num });
+                        // console.log(board[num],'ori');
+                        board[num].splice(x, 1);
+                        // console.log(board[num],'b');
+                        board[num].unshift(this._block.ranNum());
+                        // console.log(board[num],'a');
+                        // console.log('------------');
+                    });
                 }
             }
-            //判斷直線的
             board.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value == row[x + 1]) {
-                        comboV++;
+                        ++comboV;
+                        // saveVAry.push(x + 1);
                     }
                     else {
                         comboV = 1;
                         saveVAry = [];
                     }
                     if (comboV >= minCombo) {
-                        // console.log(comboV, 'comboV');
-                        // console.log(x,'x');
-                        // console.log(y,'y');
+                        console.log(comboV, 'comV');
                         for (let i = 0; i < comboV; i++) {
                             saveVAry.push(x - 1 + i);
                         }
+                        console.log(saveVAry);
                         let result = [...(new Set(saveVAry))];
-                        result.length = comboV;
-                        // console.log(result, 'savaVAry');
+                        console.log(result);
                         result.forEach((x) => {
                             x = x > 7 ? 7 : x;
                             row.splice(x, 1);
@@ -515,9 +522,9 @@ var Model;
                 x = Math.floor((position.x + 2.5) / 87.5);
             }
             for (let i = 0; i < 8; i++) {
-                this.emit('sentPosition', { x: i, y: x });
                 board[x].splice(i, 1);
                 board[x].unshift(this._block.ranNum());
+                this.emit('sentPosition', { x: i, y: x });
             }
             return board;
         }

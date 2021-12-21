@@ -135,6 +135,11 @@ namespace View {
                 let moveBlock: PIXI.Graphics;
                 // console.log(e,'e');
                 // console.log('??',this._board[e.x][e.y])
+                // console.log(this._board[7][7],'77');
+
+                if(this._board[e.x][e.y]==undefined){
+                    this.restart();
+                }
                 moveBlock = (this._block.createBlock(0, 0, 0xffffff, this._board[e.x][e.y].toString()));
                 moveBlock.x = e.y * 100 + 102.5;
                 moveBlock.y = e.x * 100 + 207.5;
@@ -169,9 +174,9 @@ namespace View {
 
         }
         private upDate(): void {
-            // if (this._controller.checkBoard(this._board)) {
-                // this.clearBard();
-            // }
+            if (this._controller.checkBoard(this._board)) {
+                this.clearBard();
+            }
             this.aim_ani(this._aim);
             this.clearHB();
 

@@ -29,9 +29,9 @@ namespace Block {
 
         public ranNum(): number {
 
-            // this.randomNum=Math.floor(Math.random() * 64)>1?this.randomNum = Math.floor(Math.random() * 7) + 1:0;
+            this.randomNum=Math.floor(Math.random() * 100)>1?this.randomNum = Math.floor(Math.random() * 7) + 1:0;
 
-            this.randomNum = Math.floor(Math.random() * 7) + 1;
+            // this.randomNum = Math.floor(Math.random() * 7) + 1;
             return this.randomNum;
 
         }
