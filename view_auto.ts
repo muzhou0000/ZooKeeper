@@ -1,4 +1,3 @@
-/*
 ///<reference path="Block.ts"/>
 
 namespace View {
@@ -132,6 +131,7 @@ namespace View {
             this._aim.scale.set(0.15, 0.15);
             this._aim.alpha = 0;
 
+            /*
             this._model.on('sentPosition', (e: { x: number, y: number }) => {
                 let moveBlock: PIXI.Graphics;
                 // console.log(e,'e');
@@ -151,10 +151,10 @@ namespace View {
                     this._app.stage.addChild(e);
 
                 });
-
-
+                
             })
-
+            
+            */
             this._model.on('checkBoard',(board:number[][])=>{
                 // console.log('checkboard      ========')
                 this._board=board;
@@ -164,7 +164,8 @@ namespace View {
             console.table(this._board);
 
             this._state = this.upDate;
-            this._app.ticker.add(() => this.gameLoop(), 16);
+            // this._app.ticker.add(() => this.gameLoop());
+            setInterval(() => this.gameLoop(),1000);
 
         }
 
@@ -175,8 +176,10 @@ namespace View {
 
         }
         private upDate(): void {
+            console.log('???');
             // if (this._controller.checkBoard(this._board)) {
-                // this.clearBard();
+                
+            //     this.clearBard();
             // }
             this.aim_ani(this._aim);
             this.clearHB();
@@ -241,6 +244,8 @@ namespace View {
 
 
         public clickBlock(block: PIXI.Graphics): void {
+            
+            // console.log(block);
 
             if (block.name == '0') {
                 //消掉一整排
@@ -250,13 +255,18 @@ namespace View {
                 }
             }
 
+            //從00到77 如果有就跑一次上下左右換
+
             if (!this._lastBlock) {
                 this._aim.alpha = 0;
                 this.cancelTimer();
                 this._lastBlock = block;
+
                 this._timer_num = setInterval(this.timer, 16);
 
             } else {
+
+                /*
 
                 let positionAX = this._lastBlock.x;
                 let positionAY = this._lastBlock.y;
@@ -289,12 +299,14 @@ namespace View {
                     }
 
                 }
-
-                this._board = this._controller.checkNomalBlock(this._lastBlock!, block, this._board);
-                this._lastBlock = undefined;
-                this._aim.alpha = 0;
-                this.clearBard();
+                */
+    
             }
+            this._board = this._controller.checkNomalBlock( this._board);
+
+            this._lastBlock = undefined;
+            this._aim.alpha = 0;
+            this.clearBard();
         }
 
         //------------工具人------------//
@@ -429,4 +441,3 @@ namespace View {
         }
     }
 }
-*/

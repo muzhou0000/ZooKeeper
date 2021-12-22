@@ -1,3 +1,4 @@
+/*
 ///<reference path="./pixi.d.ts"/>
 ///<reference path="Block.ts"/>
 
@@ -67,35 +68,21 @@ namespace Model {
             let x: number = 0;
             let result: number[] = [];
             for (let i: number = 0; i < positionY.length; i++) {
-                // console.log(i,'i');
                 for (let j: number = 0; j < positionx.length + 2; j++) {
 
                     x = positionx[i];
                     y.push(positionY[i] + j);
-
                     result = [...(new Set(y))];
-
                     x = x > 7 ? 7 : x;
 
                 }
                 if (result.length == positionx.length + 2) {
 
                     result.forEach((num: number) => {
-                        // console.log(result)
-                        // console.log(num,'num')
-                        // console.log(x);
-
                         num = num > 7 ? 7 : num;
                         this.emit('sentPosition', { x: x, y: num });
-
-                        // console.log(board[num],'ori');
                         board[num].splice(x, 1);
-
-                        // console.log(board[num],'b');
                         board[num].unshift(this._block.ranNum());
-                        // console.log(board[num],'a');
-
-                        // console.log('------------');
                     })
 
                 }
@@ -105,13 +92,12 @@ namespace Model {
                 row.forEach((value, x) => {
                     if (value == row[x + 1]) {
                         comboV++;
-                        saveVAry.push(x)
+                        saveVAry.push(x);
+
                     } else {
                         if (comboV >= minCombo) {
                             saveVAry.push(x)
                             let result: number[] = [...(new Set(saveVAry))];
-                            console.log(result);
-
                             result.forEach((x: number) => {
                                 x = x > 7 ? 7 : x;
 
@@ -201,3 +187,4 @@ namespace Model {
         }
     }
 }
+*/
