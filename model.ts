@@ -28,7 +28,6 @@ namespace Model {
             let positionx: number[] = [];
             let positionY: number[] = [];
 
-
             //判斷橫向的 把原本的陣列xy互換
 
             let transAry: number[][] = [];
@@ -38,6 +37,7 @@ namespace Model {
                     transAry[i][j] = board[j][i];
                 }
             }
+            
 
             transAry.forEach((row: number[], y) => {
                 row.forEach((value: number, x: number) => {
@@ -120,10 +120,11 @@ namespace Model {
             });
 
             // console.log(positionx, positionY);
+            
 
             this.emit('checkBoard', board);
 
-            // console.table(transAry);
+            console.table(transAry);
             this.cul(pointNum);
             return isRemove;
         }

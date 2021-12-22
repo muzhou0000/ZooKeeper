@@ -1,3 +1,4 @@
+
 ///<reference path="Block.ts"/>
 
 namespace View {
@@ -131,7 +132,7 @@ namespace View {
             this._aim.scale.set(0.15, 0.15);
             this._aim.alpha = 0;
 
-            /*
+            
             this._model.on('sentPosition', (e: { x: number, y: number }) => {
                 let moveBlock: PIXI.Graphics;
                 // console.log(e,'e');
@@ -154,7 +155,7 @@ namespace View {
                 
             })
             
-            */
+            
             this._model.on('checkBoard',(board:number[][])=>{
                 // console.log('checkboard      ========')
                 this._board=board;
@@ -164,8 +165,8 @@ namespace View {
             console.table(this._board);
 
             this._state = this.upDate;
-            // this._app.ticker.add(() => this.gameLoop());
-            setInterval(() => this.gameLoop(),1000);
+            this._app.ticker.add(() => this.gameLoop());
+            // setInterval(() => this.gameLoop(),1000);
 
         }
 
@@ -181,6 +182,7 @@ namespace View {
                 
             //     this.clearBard();
             // }
+            
             this.aim_ani(this._aim);
             this.clearHB();
 
@@ -266,6 +268,7 @@ namespace View {
 
             } else {
 
+                //-----------------
                 /*
 
                 let positionAX = this._lastBlock.x;
@@ -300,6 +303,7 @@ namespace View {
 
                 }
                 */
+                //-----------------
     
             }
             this._board = this._controller.checkNomalBlock( this._board);

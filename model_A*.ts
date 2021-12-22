@@ -16,14 +16,79 @@ namespace Model {
         }
 
         public checkBlock(board: number[][]): boolean {
-            
+
             let isRemove: boolean = false
+            let pointNum: number[] = [];
+
+            let gn: number = 0;
+            let hn: number = 0
+            let fn: number = gn + hn;
+
+            let position: { x: number, y: number } = { x: 0, y: 0 };
+
+
+            board.forEach((row: number[], y: number) => {
+                row.forEach((value: number, x: number) => {
+                    if (row[x + 1] && row[x + 2]) {
+
+                        if (value == board[y][x + 1] && board[y][x + 1] == board[y][x + 2]) {
+                            position = { x: x, y: y };
+                            //這個可以撈出最近的相同方塊
+                            if (position) {
+                                for (let i: number = 0; i < 3; i++) {
+
+                                    board[position.y].splice(position.x + i, 1);
+                                    board[position.y].unshift(this._block.ranNum());
+                                    pointNum.splice(0, 3, value);
+
+                                }
+
+                            }
+                        }
+                    }
+                    if (board[y + 1] && board[y + 2]) {
+                        if (value == board[y + 1][x] && board[y + 1][x] == board[y + 2][x]) {
+                            position = { x: x, y: y };
+
+                            if (position) {
+                                for (let i: number = 0; i < 3; i++) {
+                                    board[position.y + i].splice(position.x, 1);
+                                    board[position.y + i].unshift(this._block.ranNum());
+                                    pointNum.splice(0, 3, value);
+
+                                }
+                            }
+                        }
+                    }
+                })
+            })
+
+            //用A*的原理去撈出三個連在一起的
+            //只要管有沒有三個連一起跟消掉 只要管有沒有三個連一起跟消掉
+
+            // gn=board[y][x]
+            //Gn=起始的到目前的
+            // fn=board[]
+            //Fn=目前終點的
+
+            // if (fn <= 2) {
+            //     board[position.y].splice(position.x,1);
+            //     board[position.y].unshift(this._block.ranNum());
+
+            //     //消掉連起來的數字
+            // }
+            //判斷他有沒有連成三個
+            //從00開始到77 
+
+            /*
+
+           //-------------------
+
 
             let minCombo: number = 3;
             let comboH: number = 1;
             let comboV: number = 1;
             let saveVAry: number[] = [];
-            let pointNum: number[] = [];
 
             let positionx: number[] = [];
             let positionY: number[] = [];
@@ -119,6 +184,10 @@ namespace Model {
                 });
             });
 
+            
+           //-------------------
+           */
+
             this.emit('checkBoard', board);
 
             this.cul(pointNum);
@@ -151,87 +220,87 @@ namespace Model {
 
             board.forEach((row: number[], y) => {
                 row.forEach((value, x) => {
-                    if(board[y][x+1]){
-                    let typeA = value;
-                    let typeB = board[y][x+1];
+                    if (board[y][x + 1]) {
+                        let typeA = value;
+                        let typeB = board[y][x + 1];
 
-                        
-                        board[y][x]=typeB;
-                        board[y][x+1]=typeA;
+
+                        board[y][x] = typeB;
+                        board[y][x + 1] = typeA;
 
                         if (!this.checkBlock(board)) {
 
-                            board[y][x]=typeA;
-                            board[y][x+1]=typeB;
-    
+                            board[y][x] = typeA;
+                            board[y][x + 1] = typeB;
+
                         }
                     }
-                    
+
                 })
-            })    
+            })
             board.forEach((row: number[], y) => {
                 row.forEach((value, x) => {
-                    if(board[y][x-1]){
-                    let typeA = value;
-                    let typeB = board[y][x-1];
+                    if (board[y][x - 1]) {
+                        let typeA = value;
+                        let typeB = board[y][x - 1];
 
 
-                        board[y][x]=typeB;
-                        board[y][x-1]=typeA;
+                        board[y][x] = typeB;
+                        board[y][x - 1] = typeA;
 
                         if (!this.checkBlock(board)) {
 
-                            board[y][x]=typeA;
-                            board[y][x-1]=typeB;
-    
+                            board[y][x] = typeA;
+                            board[y][x - 1] = typeB;
+
                         }
                     }
-                    
+
                 })
             })
 
-            
+
             board.forEach((row: number[], y) => {
                 row.forEach((value, x) => {
-                    if(board[y+1]){
-                    let typeA = value;
-                    let typeB = board[y+1][x];
+                    if (board[y + 1]) {
+                        let typeA = value;
+                        let typeB = board[y + 1][x];
 
 
-                        board[y][x]=typeB;
-                        board[y+1][x]=typeA;
+                        board[y][x] = typeB;
+                        board[y + 1][x] = typeA;
 
                         if (!this.checkBlock(board)) {
 
-                            board[y][x]=typeA;
-                            board[y+1][x]=typeB;
-    
+                            board[y][x] = typeA;
+                            board[y + 1][x] = typeB;
+
                         }
                     }
-                    
+
                 })
-            })    
+            })
             board.forEach((row: number[], y) => {
                 row.forEach((value, x) => {
-                    if(board[y-1]){
-                    let typeA = value;
-                    let typeB = board[y-1][x];
+                    if (board[y - 1]) {
+                        let typeA = value;
+                        let typeB = board[y - 1][x];
 
 
-                        board[y][x]=typeB;
-                        board[y-1][x]=typeA;
+                        board[y][x] = typeB;
+                        board[y - 1][x] = typeA;
 
                         if (!this.checkBlock(board)) {
 
-                            board[y][x]=typeA;
-                            board[y-1][x]=typeB;
-    
+                            board[y][x] = typeA;
+                            board[y - 1][x] = typeB;
+
                         }
                     }
-                    
+
                 })
-            })    
-            
+            })
+
 
             return board;
         }

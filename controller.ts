@@ -16,6 +16,10 @@ namespace Controller {
             return this._model.checkBlock(board);
 
         }
+        // public checkNomalBlock(last:PIXI.Graphics,block:PIXI.Graphics,board:number[][]):number[][]{
+        //     return this._model.nomalBlock(last,block,board);
+
+        // }
         public checkNomalBlock(board:number[][]):number[][]{
             return this._model.nomalBlock(board);
 

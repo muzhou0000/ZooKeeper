@@ -489,6 +489,9 @@ var Controller;
         checkBoard(board) {
             return this._model.checkBlock(board);
         }
+        // public checkNomalBlock(last:PIXI.Graphics,block:PIXI.Graphics,board:number[][]):number[][]{
+        //     return this._model.nomalBlock(last,block,board);
+        // }
         checkNomalBlock(board) {
             return this._model.nomalBlock(board);
         }
@@ -524,6 +527,254 @@ namespace Model {
             let comboV: number = 1;
             let saveVAry: number[] = [];
             let pointNum: number[] = [];
+
+            let positionx: number[] = [];
+            let positionY: number[] = [];
+
+            //判斷橫向的 把原本的陣列xy互換
+
+            let transAry: number[][] = [];
+            for (let i: number = 0; i < 8; i++) {
+                transAry.push([]);
+                for (let j: number = 0; j < 8; j++) {
+                    transAry[i][j] = board[j][i];
+                }
+            }
+            
+
+            transAry.forEach((row: number[], y) => {
+                row.forEach((value: number, x: number) => {
+                    if (value == row[x + 1]) {
+                        comboH++;
+                        // console.log(positionx);
+                        if (comboH >= minCombo) {
+                            positionx.push(y);
+                            positionY.push(x - 1);
+                            pointNum.splice(0, 3, value);
+                            isRemove = true;
+                        }
+                    } else {
+                        comboH = 1;
+                    }
+                })
+            })
+            //找完之後再轉回去判斷直的
+            for (let i: number = 0; i < 8; i++) {
+                for (let j: number = 0; j < 8; j++) {
+                    board[i][j] = transAry[j][i];
+                }
+            }
+
+            //刪掉橫向的
+            // console.log(positionx, positionY);
+            let y: number[] = [];
+            let x: number = 0;
+            let result: number[] = [];
+            for (let i: number = 0; i < positionY.length; i++) {
+                for (let j: number = 0; j < positionx.length + 2; j++) {
+
+                    x = positionx[i];
+                    y.push(positionY[i] + j);
+                    result = [...(new Set(y))];
+                    x = x > 7 ? 7 : x;
+
+                }
+                if (result.length == positionx.length + 2) {
+
+                    result.forEach((num: number) => {
+                        num = num > 7 ? 7 : num;
+                        this.emit('sentPosition', { x: x, y: num });
+                        board[num].splice(x, 1);
+                        board[num].unshift(this._block.ranNum());
+                    })
+
+                }
+            }
+
+            board.forEach((row: number[], y) => {
+                row.forEach((value, x) => {
+                    if (value == row[x + 1]) {
+                        comboV++;
+                        saveVAry.push(x);
+
+                    } else {
+                        if (comboV >= minCombo) {
+                            saveVAry.push(x)
+                            let result: number[] = [...(new Set(saveVAry))];
+                            result.forEach((x: number) => {
+                                x = x > 7 ? 7 : x;
+
+                                row.splice(x, 1);
+
+                                this.emit('sentPosition', { x, y });
+
+                                pointNum.splice(0, 3, value);
+                                isRemove = true;
+                                row.unshift(this._block.ranNum());
+
+                            });
+                        }
+
+                        comboV = 1;
+                        saveVAry = [];
+                    }
+
+                });
+            });
+
+            // console.log(positionx, positionY);
+            
+
+            this.emit('checkBoard', board);
+
+            console.table(transAry);
+            this.cul(pointNum);
+            return isRemove;
+        }
+
+        public specialBlock(block: PIXI.Graphics, board: number[][]): number[][] {
+
+            let position = block.getBounds();
+            let x: number = 0;
+
+            if (Math.floor((position.x + 2.5) / 87.5) > 3) {
+                x = Math.floor((position.x + 2.5) / 87.5) - 1;
+            } else {
+                x = Math.floor((position.x + 2.5) / 87.5);
+            }
+            for (let i: number = 0; i < 8; i++) {
+
+
+                board[x].splice(i, 1);
+                board[x].unshift(this._block.ranNum());
+                this.emit('sentPosition', { x: i, y: x });
+
+            }
+            return board;
+        }
+
+
+        public nomalBlock(last: PIXI.Graphics, block: PIXI.Graphics, board: number[][]): number[][] {
+
+            let positionA = last.getBounds();
+            let positionB = block.getBounds();
+
+            //把每個方塊的位置都換算到棋盤上面
+            if (Math.abs(positionA.x - positionB.x) == 100 && Math.abs(positionA.y - positionB.y) == 0 || Math.abs(positionA.x - positionB.x) == 0 && Math.abs(positionA.y - positionB.y) == 100) {
+
+                let typeA = last.name;
+                let typeB = block.name;
+
+                Math.floor((positionA.x + 2.5) / 87) > 3 ? board[Math.floor((positionA.x + 2.5) / 87) - 1][Math.floor((positionA.y - 100) / 100)] = Number(typeB) : board[Math.floor((positionA.x + 2.5) / 87)][Math.floor((positionA.y - 100) / 100)] = Number(typeB);
+                Math.floor((positionB.x + 2.5) / 87) > 3 ? board[Math.floor((positionB.x + 2.5) / 87) - 1][Math.floor((positionB.y - 100) / 100)] = Number(typeA) : board[Math.floor((positionB.x + 2.5) / 87)][Math.floor((positionB.y - 100) / 100)] = Number(typeA);
+
+                //如果沒有可以消掉的就把名字換回來
+                if (!this.checkBlock(board)) {
+
+                    Math.floor((positionA.x + 2.5) / 87) > 3 ? board[Math.floor((positionA.x + 2.5) / 87) - 1][Math.floor((positionA.y - 100) / 100)] = Number(typeA) : board[Math.floor((positionA.x + 2.5) / 87)][Math.floor((positionA.y - 100) / 100)] = Number(typeA);
+                    Math.floor((positionB.x + 2.5) / 87) > 3 ? board[Math.floor((positionB.x + 2.5) / 87) - 1][Math.floor((positionB.y - 100) / 100)] = Number(typeB) : board[Math.floor((positionB.x + 2.5) / 87)][Math.floor((positionB.y - 100) / 100)] = Number(typeB);
+                }
+
+            }
+
+            return board;
+        }
+
+        public cul(point: number[]): void {
+
+            if (point.length > 0) {
+                let result = [...point].reduce((a: number, b: number) => {
+                    return (a + b);
+                })
+                this.emit("sentPoint", result);
+            }
+        }
+    }
+}
+*/ 
+///<reference path="./pixi.d.ts"/>
+///<reference path="./view.ts"/>
+///<reference path="./controller.ts"/>
+///<reference path="./model.ts"/>
+document.addEventListener("DOMContentLoaded", () => {
+    new Main();
+});
+class Main {
+    constructor() {
+        this._model = new Model.model();
+        this._controller = new Controller.controller(this._model);
+        this._view = new View.view(this._controller, this._model);
+    }
+}
+///<reference path="./pixi.d.ts"/>
+///<reference path="Block.ts"/>
+var Model;
+///<reference path="./pixi.d.ts"/>
+///<reference path="Block.ts"/>
+(function (Model) {
+    class model extends PIXI.utils.EventEmitter {
+        constructor() {
+            super();
+            this._block = new Block.block();
+        }
+        checkBlock(board) {
+            let isRemove = false;
+            let pointNum = [];
+            let gn = 0;
+            let hn = 0;
+            let fn = gn + hn;
+            let position = { x: 0, y: 0 };
+            board.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (row[x + 1] && row[x + 2]) {
+                        if (value == board[y][x + 1] && board[y][x + 1] == board[y][x + 2]) {
+                            position = { x: x, y: y };
+                            //這個可以撈出最近的相同方塊
+                            if (position) {
+                                for (let i = 0; i < 3; i++) {
+                                    board[position.y].splice(position.x + i, 1);
+                                    board[position.y].unshift(this._block.ranNum());
+                                    pointNum.splice(0, 3, value);
+                                }
+                            }
+                        }
+                    }
+                    if (board[y + 1] && board[y + 2]) {
+                        if (value == board[y + 1][x] && board[y + 1][x] == board[y + 2][x]) {
+                            position = { x: x, y: y };
+                            if (position) {
+                                for (let i = 0; i < 3; i++) {
+                                    board[position.y + i].splice(position.x, 1);
+                                    board[position.y + i].unshift(this._block.ranNum());
+                                    pointNum.splice(0, 3, value);
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+            //用A*的原理去撈出三個連在一起的
+            //只要管有沒有三個連一起跟消掉 只要管有沒有三個連一起跟消掉
+            // gn=board[y][x]
+            //Gn=起始的到目前的
+            // fn=board[]
+            //Fn=目前終點的
+            // if (fn <= 2) {
+            //     board[position.y].splice(position.x,1);
+            //     board[position.y].unshift(this._block.ranNum());
+            //     //消掉連起來的數字
+            // }
+            //判斷他有沒有連成三個
+            //從00開始到77 
+            /*
+
+           //-------------------
+
+
+            let minCombo: number = 3;
+            let comboH: number = 1;
+            let comboV: number = 1;
+            let saveVAry: number[] = [];
 
             let positionx: number[] = [];
             let positionY: number[] = [];
@@ -619,185 +870,9 @@ namespace Model {
                 });
             });
 
-            // console.log(positionx, positionY);
-
-            this.emit('checkBoard', board);
-
-            // console.table(transAry);
-            this.cul(pointNum);
-            return isRemove;
-        }
-
-        public specialBlock(block: PIXI.Graphics, board: number[][]): number[][] {
-
-            let position = block.getBounds();
-            let x: number = 0;
-
-            if (Math.floor((position.x + 2.5) / 87.5) > 3) {
-                x = Math.floor((position.x + 2.5) / 87.5) - 1;
-            } else {
-                x = Math.floor((position.x + 2.5) / 87.5);
-            }
-            for (let i: number = 0; i < 8; i++) {
-
-
-                board[x].splice(i, 1);
-                board[x].unshift(this._block.ranNum());
-                this.emit('sentPosition', { x: i, y: x });
-
-            }
-            return board;
-        }
-
-
-        public nomalBlock(last: PIXI.Graphics, block: PIXI.Graphics, board: number[][]): number[][] {
-
-            let positionA = last.getBounds();
-            let positionB = block.getBounds();
-
-            //把每個方塊的位置都換算到棋盤上面
-            if (Math.abs(positionA.x - positionB.x) == 100 && Math.abs(positionA.y - positionB.y) == 0 || Math.abs(positionA.x - positionB.x) == 0 && Math.abs(positionA.y - positionB.y) == 100) {
-
-                let typeA = last.name;
-                let typeB = block.name;
-
-                Math.floor((positionA.x + 2.5) / 87) > 3 ? board[Math.floor((positionA.x + 2.5) / 87) - 1][Math.floor((positionA.y - 100) / 100)] = Number(typeB) : board[Math.floor((positionA.x + 2.5) / 87)][Math.floor((positionA.y - 100) / 100)] = Number(typeB);
-                Math.floor((positionB.x + 2.5) / 87) > 3 ? board[Math.floor((positionB.x + 2.5) / 87) - 1][Math.floor((positionB.y - 100) / 100)] = Number(typeA) : board[Math.floor((positionB.x + 2.5) / 87)][Math.floor((positionB.y - 100) / 100)] = Number(typeA);
-
-                //如果沒有可以消掉的就把名字換回來
-                if (!this.checkBlock(board)) {
-
-                    Math.floor((positionA.x + 2.5) / 87) > 3 ? board[Math.floor((positionA.x + 2.5) / 87) - 1][Math.floor((positionA.y - 100) / 100)] = Number(typeA) : board[Math.floor((positionA.x + 2.5) / 87)][Math.floor((positionA.y - 100) / 100)] = Number(typeA);
-                    Math.floor((positionB.x + 2.5) / 87) > 3 ? board[Math.floor((positionB.x + 2.5) / 87) - 1][Math.floor((positionB.y - 100) / 100)] = Number(typeB) : board[Math.floor((positionB.x + 2.5) / 87)][Math.floor((positionB.y - 100) / 100)] = Number(typeB);
-                }
-
-            }
-
-            return board;
-        }
-
-        public cul(point: number[]): void {
-
-            if (point.length > 0) {
-                let result = [...point].reduce((a: number, b: number) => {
-                    return (a + b);
-                })
-                this.emit("sentPoint", result);
-            }
-        }
-    }
-}
-*/
-///<reference path="./pixi.d.ts"/>
-///<reference path="./view.ts"/>
-///<reference path="./controller.ts"/>
-///<reference path="./model.ts"/>
-document.addEventListener("DOMContentLoaded", () => {
-    new Main();
-});
-class Main {
-    constructor() {
-        this._model = new Model.model();
-        this._controller = new Controller.controller(this._model);
-        this._view = new View.view(this._controller, this._model);
-    }
-}
-///<reference path="./pixi.d.ts"/>
-///<reference path="Block.ts"/>
-var Model;
-///<reference path="./pixi.d.ts"/>
-///<reference path="Block.ts"/>
-(function (Model) {
-    class model extends PIXI.utils.EventEmitter {
-        constructor() {
-            super();
-            this._block = new Block.block();
-        }
-        checkBlock(board) {
-            let isRemove = false;
-            let minCombo = 3;
-            let comboH = 1;
-            let comboV = 1;
-            let saveVAry = [];
-            let pointNum = [];
-            let positionx = [];
-            let positionY = [];
-            //判斷橫向的 把原本的陣列xy互換
-            let transAry = [];
-            for (let i = 0; i < 8; i++) {
-                transAry.push([]);
-                for (let j = 0; j < 8; j++) {
-                    transAry[i][j] = board[j][i];
-                }
-            }
-            transAry.forEach((row, y) => {
-                row.forEach((value, x) => {
-                    if (value == row[x + 1]) {
-                        comboH++;
-                        // console.log(positionx);
-                        if (comboH >= minCombo) {
-                            positionx.push(y);
-                            positionY.push(x - 1);
-                            pointNum.splice(0, 3, value);
-                            isRemove = true;
-                        }
-                    }
-                    else {
-                        comboH = 1;
-                    }
-                });
-            });
-            //找完之後再轉回去判斷直的
-            for (let i = 0; i < 8; i++) {
-                for (let j = 0; j < 8; j++) {
-                    board[i][j] = transAry[j][i];
-                }
-            }
-            //刪掉橫向的
-            // console.log(positionx, positionY);
-            let y = [];
-            let x = 0;
-            let result = [];
-            for (let i = 0; i < positionY.length; i++) {
-                for (let j = 0; j < positionx.length + 2; j++) {
-                    x = positionx[i];
-                    y.push(positionY[i] + j);
-                    result = [...(new Set(y))];
-                    x = x > 7 ? 7 : x;
-                }
-                if (result.length == positionx.length + 2) {
-                    result.forEach((num) => {
-                        num = num > 7 ? 7 : num;
-                        this.emit('sentPosition', { x: x, y: num });
-                        board[num].splice(x, 1);
-                        board[num].unshift(this._block.ranNum());
-                    });
-                }
-            }
-            board.forEach((row, y) => {
-                row.forEach((value, x) => {
-                    if (value == row[x + 1]) {
-                        comboV++;
-                        saveVAry.push(x);
-                    }
-                    else {
-                        if (comboV >= minCombo) {
-                            saveVAry.push(x);
-                            let result = [...(new Set(saveVAry))];
-                            result.forEach((x) => {
-                                x = x > 7 ? 7 : x;
-                                row.splice(x, 1);
-                                this.emit('sentPosition', { x, y });
-                                pointNum.splice(0, 3, value);
-                                isRemove = true;
-                                row.unshift(this._block.ranNum());
-                            });
-                        }
-                        comboV = 1;
-                        saveVAry = [];
-                    }
-                });
-            });
+            
+           //-------------------
+           */
             this.emit('checkBoard', board);
             this.cul(pointNum);
             return isRemove;
@@ -1125,14 +1200,12 @@ var View;
             this._aim.anchor.set(0.5, 0.5);
             this._aim.scale.set(0.15, 0.15);
             this._aim.alpha = 0;
-            /*
-            this._model.on('sentPosition', (e: { x: number, y: number }) => {
-                let moveBlock: PIXI.Graphics;
+            this._model.on('sentPosition', (e) => {
+                let moveBlock;
                 // console.log(e,'e');
                 // console.log('??',this._board[e.x][e.y])
                 // console.log(this._board[7][7],'77');
-
-                if(this._board[e.x][e.y]==undefined){
+                if (this._board[e.x][e.y] == undefined) {
                     this.restart();
                 }
                 moveBlock = (this._block.createBlock(0, 0, 0xffffff, this._board[e.x][e.y].toString()));
@@ -1141,14 +1214,10 @@ var View;
                 moveBlock.buttonMode = false;
                 moveBlock.interactive = false;
                 this.clearHblock.push(moveBlock);
-                this.clearHblock.forEach((e: PIXI.Graphics) => {
+                this.clearHblock.forEach((e) => {
                     this._app.stage.addChild(e);
-
                 });
-                
-            })
-            
-            */
+            });
             this._model.on('checkBoard', (board) => {
                 // console.log('checkboard      ========')
                 this._board = board;
@@ -1156,8 +1225,8 @@ var View;
             this.board();
             console.table(this._board);
             this._state = this.upDate;
-            // this._app.ticker.add(() => this.gameLoop());
-            setInterval(() => this.gameLoop(), 1000);
+            this._app.ticker.add(() => this.gameLoop());
+            // setInterval(() => this.gameLoop(),1000);
         }
         //------------LoOoOoOoOoP------------//
         gameLoop() {
@@ -1165,10 +1234,9 @@ var View;
         }
         upDate() {
             console.log('???');
-            this._board = this._controller.checkNomalBlock(this._board);
-            this.clearBard();
-            if (this._controller.checkBoard(this._board)) {
-            }
+            // if (this._controller.checkBoard(this._board)) {
+            //     this.clearBard();
+            // }
             this.aim_ani(this._aim);
             this.clearHB();
         }
@@ -1232,6 +1300,7 @@ var View;
                 this._timer_num = setInterval(this.timer, 16);
             }
             else {
+                //-----------------
                 /*
 
                 let positionAX = this._lastBlock.x;
@@ -1266,7 +1335,9 @@ var View;
 
                 }
                 */
+                //-----------------
             }
+            this._board = this._controller.checkNomalBlock(this._board);
             this._lastBlock = undefined;
             this._aim.alpha = 0;
             this.clearBard();
