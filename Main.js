@@ -717,24 +717,82 @@ var Model;
             super();
             this._block = new Block.block();
         }
-        checkBlock(board) {
+        a_checkBlock(board) {
+            //目標
+            //board[y][x],board[y][x+1],board[y][x+2];
+            //board[y][x],board[y+1][x],board[y+2][x];
+            //都消掉
             let isRemove = false;
             let pointNum = [];
+            let fn = 0;
             let gn = 0;
+            //這個是d開頭的演算法 會跑全部地圖
             let hn = 0;
-            let fn = gn + hn;
+            //這個是貪婪演算法 直奔終點 不撞南牆不回頭
+            let openAry;
+            let closeAry;
+            board.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    for (let i = 0; i < 3; i++) {
+                        if (row[x + i]) {
+                            if (row[x + i] == value) {
+                                fn += 1;
+                            }
+                        }
+                        else {
+                            if (fn >= 2) {
+                                pointNum.splice(0, 3, value);
+                                let X = x - i;
+                                this.emit('sentPosition', { x: X, y: y });
+                                board[y].splice(X, 1);
+                                board[y].unshift(this._block.ranNum());
+                                isRemove = true;
+                            }
+                            fn = 0;
+                        }
+                    }
+                    for (let i = 0; i < 3; i++) {
+                        if (board[y + i]) {
+                            if (board[y + i][x] == value) {
+                                fn += 1;
+                            }
+                        }
+                        else {
+                            if (fn >= 2) {
+                                let Y = y - i;
+                                this.emit('sentPosition', { x: x, y: Y });
+                                board[Y].splice(x, 1);
+                                board[Y].unshift(this._block.ranNum());
+                                pointNum.splice(0, 3, value);
+                                isRemove = true;
+                            }
+                            fn = 0;
+                        }
+                    }
+                });
+            });
+            this.emit('checkBoard', board);
+            this.cul(pointNum);
+            return isRemove;
+        }
+        checkBlock(board) {
+            //消除的演算法
+            let isRemove = false;
+            let pointNum = [];
             let position = { x: 0, y: 0 };
             board.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (row[x + 1] && row[x + 2]) {
                         if (value == board[y][x + 1] && board[y][x + 1] == board[y][x + 2]) {
                             position = { x: x, y: y };
-                            //這個可以撈出最近的相同方塊
                             if (position) {
                                 for (let i = 0; i < 3; i++) {
-                                    board[position.y].splice(position.x + i, 1);
+                                    let X = position.x + i;
+                                    board[position.y].splice(X, 1);
+                                    this.emit('sentPosition', { x: X, y: position.y });
                                     board[position.y].unshift(this._block.ranNum());
                                     pointNum.splice(0, 3, value);
+                                    isRemove = true;
                                 }
                             }
                         }
@@ -744,9 +802,12 @@ var Model;
                             position = { x: x, y: y };
                             if (position) {
                                 for (let i = 0; i < 3; i++) {
-                                    board[position.y + i].splice(position.x, 1);
+                                    let Y = position.y + i;
+                                    board[Y].splice(position.x, 1);
+                                    this.emit('sentPosition', { x: position.x, y: Y });
                                     board[position.y + i].unshift(this._block.ranNum());
                                     pointNum.splice(0, 3, value);
+                                    isRemove = true;
                                 }
                             }
                         }
@@ -755,124 +816,6 @@ var Model;
             });
             //用A*的原理去撈出三個連在一起的
             //只要管有沒有三個連一起跟消掉 只要管有沒有三個連一起跟消掉
-            // gn=board[y][x]
-            //Gn=起始的到目前的
-            // fn=board[]
-            //Fn=目前終點的
-            // if (fn <= 2) {
-            //     board[position.y].splice(position.x,1);
-            //     board[position.y].unshift(this._block.ranNum());
-            //     //消掉連起來的數字
-            // }
-            //判斷他有沒有連成三個
-            //從00開始到77 
-            /*
-
-           //-------------------
-
-
-            let minCombo: number = 3;
-            let comboH: number = 1;
-            let comboV: number = 1;
-            let saveVAry: number[] = [];
-
-            let positionx: number[] = [];
-            let positionY: number[] = [];
-
-
-            //判斷橫向的 把原本的陣列xy互換
-
-            let transAry: number[][] = [];
-            for (let i: number = 0; i < 8; i++) {
-                transAry.push([]);
-                for (let j: number = 0; j < 8; j++) {
-                    transAry[i][j] = board[j][i];
-                }
-            }
-
-            transAry.forEach((row: number[], y) => {
-                row.forEach((value: number, x: number) => {
-                    if (value == row[x + 1]) {
-                        comboH++;
-                        // console.log(positionx);
-                        if (comboH >= minCombo) {
-                            positionx.push(y);
-                            positionY.push(x - 1);
-                            pointNum.splice(0, 3, value);
-                            isRemove = true;
-                        }
-                    } else {
-                        comboH = 1;
-                    }
-                })
-            })
-            //找完之後再轉回去判斷直的
-            for (let i: number = 0; i < 8; i++) {
-                for (let j: number = 0; j < 8; j++) {
-                    board[i][j] = transAry[j][i];
-                }
-            }
-
-            //刪掉橫向的
-            // console.log(positionx, positionY);
-            let y: number[] = [];
-            let x: number = 0;
-            let result: number[] = [];
-            for (let i: number = 0; i < positionY.length; i++) {
-                for (let j: number = 0; j < positionx.length + 2; j++) {
-
-                    x = positionx[i];
-                    y.push(positionY[i] + j);
-                    result = [...(new Set(y))];
-                    x = x > 7 ? 7 : x;
-
-                }
-                if (result.length == positionx.length + 2) {
-
-                    result.forEach((num: number) => {
-                        num = num > 7 ? 7 : num;
-                        this.emit('sentPosition', { x: x, y: num });
-                        board[num].splice(x, 1);
-                        board[num].unshift(this._block.ranNum());
-                    })
-
-                }
-            }
-
-            board.forEach((row: number[], y) => {
-                row.forEach((value, x) => {
-                    if (value == row[x + 1]) {
-                        comboV++;
-                        saveVAry.push(x);
-
-                    } else {
-                        if (comboV >= minCombo) {
-                            saveVAry.push(x)
-                            let result: number[] = [...(new Set(saveVAry))];
-                            result.forEach((x: number) => {
-                                x = x > 7 ? 7 : x;
-
-                                row.splice(x, 1);
-
-                                this.emit('sentPosition', { x, y });
-
-                                pointNum.splice(0, 3, value);
-                                isRemove = true;
-                                row.unshift(this._block.ranNum());
-
-                            });
-                        }
-
-                        comboV = 1;
-                        saveVAry = [];
-                    }
-
-                });
-            });
-
-            
-           //-------------------
-           */
             this.emit('checkBoard', board);
             this.cul(pointNum);
             return isRemove;
@@ -960,68 +903,6 @@ var Model;
                 this.emit("sentPoint", result);
             }
         }
-        a_checkBlock(board) {
-            let isRemove = false;
-            let endPoint = 0;
-            let going = [];
-            let goingPath = [];
-            board.forEach((row, y) => {
-                row.forEach((value, x) => {
-                    //第一步搜尋九宮格
-                    if (board[y] && board[y][x + 1] == value) {
-                        going.push(board[y][x + 1]);
-                        goingPath.push({ x: x + 1, y: y });
-                    }
-                    if (board[y] && board[y][x - 1] == value) {
-                        going.push(board[y][x - 1]);
-                        goingPath.push({ x: x - 1, y: y });
-                    }
-                    if (board[y + 1] && board[y + 1][x] == value) {
-                        going.push(board[y + 1][x]);
-                        goingPath.push({ x: x, y: y + 1 });
-                    }
-                    if (board[y + 1] && board[y + 1][x + 1] == value) {
-                        going.push(board[y + 1][x + 1]);
-                        goingPath.push({ x: x + 1, y: y + 1 });
-                    }
-                    if (board[y + 1] && board[y + 1][x - 1] == value) {
-                        going.push(board[y + 1][x - 1]);
-                        goingPath.push({ x: x - 1, y: y + 1 });
-                    }
-                    if (board[y - 1] && board[y - 1][x] == value) {
-                        going.push(board[y - 1][x]);
-                        goingPath.push({ x: x, y: y - 1 });
-                    }
-                    if (board[y - 1] && board[y - 1][x + 1] == value) {
-                        going.push(board[y - 1][x + 1]);
-                        goingPath.push({ x: x - 1, y: y + 1 });
-                    }
-                    if (board[y - 1] && board[y - 1][x - 1] == value) {
-                        going.push(board[y - 1][x] - 1);
-                        goingPath.push({ x: x - 1, y: y - 1 });
-                    }
-                    //第二步找出連續有兩個以上的位置
-                    if (going[going.length - 1] && going[going.length - 2] == going[going.length - 1]) {
-                        // console.log(board[y][x], 'y:' + y, 'x:' + x);
-                        // goingPath = [];
-                    }
-                    //第三步找出來的位置用看上下左右移動能不能達成目標？
-                    //目前盤面是已經換完的了
-                    //Fn=Gn(開始到目前)+Hn(目前到終點）
-                    //如果Fn的距離<=2 則可以移動
-                    //起點是每一個位置
-                    //終點是距離最近的相同顏色？
-                    //應該說我只要做第一步 如果觸發條件（三個）就觸發消除？
-                    //如果我
-                    console.log(row);
-                    console.log(going);
-                });
-                going = [];
-                goingPath = [];
-                console.log('----------');
-            });
-            return isRemove;
-        }
     }
     Model.model = model;
 })(Model || (Model = {}));
@@ -1050,6 +931,7 @@ var View;
                 // }
                 this._timeLine.width -= 0.2;
             };
+            //變白的
             this.clearHB = () => {
                 this.clearHblock.forEach((e) => {
                     e.alpha -= 0.015;
@@ -1200,12 +1082,12 @@ var View;
             this._aim.anchor.set(0.5, 0.5);
             this._aim.scale.set(0.15, 0.15);
             this._aim.alpha = 0;
-            this._model.on('sentPosition', (e) => {
-                let moveBlock;
-                // console.log(e,'e');
-                // console.log('??',this._board[e.x][e.y])
-                // console.log(this._board[7][7],'77');
-                if (this._board[e.x][e.y] == undefined) {
+            //傳進來變白色
+            /*
+            this._model.on('sentPosition', (e: { x: number, y: number }) => {
+                let moveBlock: PIXI.Graphics;
+
+                if(this._board[e.x][e.y]==undefined){
                     this.restart();
                 }
                 moveBlock = (this._block.createBlock(0, 0, 0xffffff, this._board[e.x][e.y].toString()));
@@ -1214,28 +1096,30 @@ var View;
                 moveBlock.buttonMode = false;
                 moveBlock.interactive = false;
                 this.clearHblock.push(moveBlock);
-                this.clearHblock.forEach((e) => {
+                this.clearHblock.forEach((e: PIXI.Graphics) => {
                     this._app.stage.addChild(e);
+
                 });
-            });
+                
+            })
+            */
             this._model.on('checkBoard', (board) => {
-                // console.log('checkboard      ========')
                 this._board = board;
             });
             this.board();
             console.table(this._board);
             this._state = this.upDate;
-            this._app.ticker.add(() => this.gameLoop());
-            // setInterval(() => this.gameLoop(),1000);
+            // this._app.ticker.add(() => this.gameLoop());
+            setInterval(() => this.gameLoop(), 1000);
         }
         //------------LoOoOoOoOoP------------//
         gameLoop() {
             this._state();
         }
         upDate() {
-            console.log('???');
             // if (this._controller.checkBoard(this._board)) {
-            //     this.clearBard();
+            this._board = this._controller.checkNomalBlock(this._board);
+            this.clearBard();
             // }
             this.aim_ani(this._aim);
             this.clearHB();
@@ -1292,7 +1176,6 @@ var View;
                     this.clearBard();
                 }
             }
-            //從00到77 如果有就跑一次上下左右換
             if (!this._lastBlock) {
                 this._aim.alpha = 0;
                 this.cancelTimer();
@@ -1300,6 +1183,7 @@ var View;
                 this._timer_num = setInterval(this.timer, 16);
             }
             else {
+                //因為現在交換位置在model沒有過來 所以這一串目前沒有用
                 //-----------------
                 /*
 
@@ -1337,7 +1221,7 @@ var View;
                 */
                 //-----------------
             }
-            this._board = this._controller.checkNomalBlock(this._board);
+            // this._board = this._controller.checkNomalBlock( this._board);
             this._lastBlock = undefined;
             this._aim.alpha = 0;
             this.clearBard();

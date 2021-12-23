@@ -132,12 +132,12 @@ namespace View {
             this._aim.scale.set(0.15, 0.15);
             this._aim.alpha = 0;
 
-            
+
+
+            //傳進來變白色
+            /*
             this._model.on('sentPosition', (e: { x: number, y: number }) => {
                 let moveBlock: PIXI.Graphics;
-                // console.log(e,'e');
-                // console.log('??',this._board[e.x][e.y])
-                // console.log(this._board[7][7],'77');
 
                 if(this._board[e.x][e.y]==undefined){
                     this.restart();
@@ -154,10 +154,10 @@ namespace View {
                 });
                 
             })
+            */
             
             
             this._model.on('checkBoard',(board:number[][])=>{
-                // console.log('checkboard      ========')
                 this._board=board;
             })
 
@@ -165,8 +165,8 @@ namespace View {
             console.table(this._board);
 
             this._state = this.upDate;
-            this._app.ticker.add(() => this.gameLoop());
-            // setInterval(() => this.gameLoop(),1000);
+            // this._app.ticker.add(() => this.gameLoop());
+            setInterval(() => this.gameLoop(),1000);
 
         }
 
@@ -177,10 +177,10 @@ namespace View {
 
         }
         private upDate(): void {
-            console.log('???');
             // if (this._controller.checkBoard(this._board)) {
                 
-            //     this.clearBard();
+                this._board = this._controller.checkNomalBlock( this._board);
+                this.clearBard();
             // }
             
             this.aim_ani(this._aim);
@@ -257,7 +257,6 @@ namespace View {
                 }
             }
 
-            //從00到77 如果有就跑一次上下左右換
 
             if (!this._lastBlock) {
                 this._aim.alpha = 0;
@@ -268,6 +267,7 @@ namespace View {
 
             } else {
 
+                //因為現在交換位置在model沒有過來 所以這一串目前沒有用
                 //-----------------
                 /*
 
@@ -306,7 +306,7 @@ namespace View {
                 //-----------------
     
             }
-            this._board = this._controller.checkNomalBlock( this._board);
+            // this._board = this._controller.checkNomalBlock( this._board);
 
             this._lastBlock = undefined;
             this._aim.alpha = 0;
@@ -361,6 +361,7 @@ namespace View {
             aim.rotation += 0.01;
 
         }
+        //變白的
         private clearHB = (): void => {
             this.clearHblock.forEach((e: PIXI.Graphics) => {
 
