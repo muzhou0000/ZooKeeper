@@ -12,14 +12,17 @@ namespace Controller {
             
         }
 
-        public checkBoard(board:number[][]):boolean{
-            return this._model.checkBlock(board);
+        // public checkBoard(board:number[][]):boolean{
+        //     return this._model.checkBlock(board);
 
-        }
+        // }
+
+        //手動轉的
         // public checkNomalBlock(last:PIXI.Graphics,block:PIXI.Graphics,board:number[][]):number[][]{
         //     return this._model.nomalBlock(last,block,board);
 
         // }
+        //自動的
         public checkNomalBlock(board:number[][]):number[][]{
             return this._model.nomalBlock(board);
 

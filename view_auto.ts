@@ -28,9 +28,7 @@ namespace View {
 
 
         //-----------TEST-----------//
-        private timer_scale: number = 0;
         private clearHblock: PIXI.Graphics[] = [];
-        private changBlock: PIXI.Graphics[] = [];
 
 
 
@@ -139,7 +137,7 @@ namespace View {
             this._model.on('sentPosition', (e: { x: number, y: number }) => {
                 let moveBlock: PIXI.Graphics;
 
-                if(this._board[e.x][e.y]==undefined){
+                if (this._board[e.x][e.y] == undefined) {
                     this.restart();
                 }
                 moveBlock = (this._block.createBlock(0, 0, 0xffffff, this._board[e.x][e.y].toString()));
@@ -148,17 +146,19 @@ namespace View {
                 moveBlock.buttonMode = false;
                 moveBlock.interactive = false;
                 this.clearHblock.push(moveBlock);
+
                 this.clearHblock.forEach((e: PIXI.Graphics) => {
                     this._app.stage.addChild(e);
 
                 });
-                
+
             })
             */
-            
-            
-            this._model.on('checkBoard',(board:number[][])=>{
-                this._board=board;
+
+
+
+            this._model.on('checkBoard', (board: number[][]) => {
+                this._board = board;
             })
 
             this.board();
@@ -166,7 +166,7 @@ namespace View {
 
             this._state = this.upDate;
             // this._app.ticker.add(() => this.gameLoop());
-            setInterval(() => this.gameLoop(),1000);
+            setInterval(() => this.gameLoop(), 1000);
 
         }
 
@@ -177,12 +177,10 @@ namespace View {
 
         }
         private upDate(): void {
-            // if (this._controller.checkBoard(this._board)) {
-                
-                this._board = this._controller.checkNomalBlock( this._board);
-                this.clearBard();
-            // }
-            
+
+            this._board = this._controller.checkNomalBlock(this._board);
+            this.clearBard();
+
             this.aim_ani(this._aim);
             this.clearHB();
 
@@ -203,16 +201,16 @@ namespace View {
                     this._gameScreen.addChild(newBlock);
 
                     newBlock.on('click', (block: any) => {
-                        this.clickBlock(block.target);
+                        this.clickBlock();
                         this._aim.alpha = 1;
                         this._aim.x = block.target.x - 0.5;
                         this._aim.y = block.target.y;
                     })
                 }
             }
-            if (this._controller.checkBoard(this._board)) {
-                this.clearBard();
-            }
+            // if (this._controller.checkBoard(this._board)) {
+            this.clearBard();
+            // }
 
         }
 
@@ -221,8 +219,7 @@ namespace View {
 
             this._board.forEach((row: number[], i: number) => {
 
-                row.forEach((value, j) => {
-
+                row.forEach((value: number, j: number) => {
                     let A: PIXI.Graphics = this._block.createBlock(0, 0, this._block._color[value], value.toString());
                     A.x = i * 100 + 102;
                     A.y = j * 100 + 207;
@@ -234,7 +231,7 @@ namespace View {
                 this._gameScreen.addChild(block);
 
                 block.on('click', (block: any) => {
-                    this.clickBlock(block.target);
+                    this.clickBlock();
                     this._aim.alpha = 1;
                     this._aim.x = block.target.x - 0.5;
                     this._aim.y = block.target.y;
@@ -245,72 +242,18 @@ namespace View {
         }
 
 
-        public clickBlock(block: PIXI.Graphics): void {
-            
-            // console.log(block);
-
-            if (block.name == '0') {
-                //消掉一整排
-                this._board=this._controller.checkSpecialBlock(block, this._board);
-                if (this._controller.checkBoard(this._board)) {
-                    this.clearBard();
-                }
-            }
-
+        public clickBlock(): void {
 
             if (!this._lastBlock) {
-                this._aim.alpha = 0;
                 this.cancelTimer();
-                this._lastBlock = block;
-
                 this._timer_num = setInterval(this.timer, 16);
-
-            } else {
-
-                //因為現在交換位置在model沒有過來 所以這一串目前沒有用
-                //-----------------
-                /*
-
-                let positionAX = this._lastBlock.x;
-                let positionAY = this._lastBlock.y;
-                let positionBX = block.x;
-                let positionBY = block.y;
-                let typeA = this._lastBlock.name;
-                let typeB = block.name;
-
-                if (Math.abs(positionAX - positionBX) == 100 && Math.abs(positionAY - positionBY) == 0 || Math.abs(positionAX - positionBX) == 0 && Math.abs(positionAY - positionBY) == 100) {
-
-                    this.changBlock[0] = this._block.createBlock(0, 0, this._block._color[typeB!], typeB!);
-                    this.changBlock[1] = this._block.createBlock(0, 0, this._block._color[typeA!], typeA!);
-
-                    this.changBlock[0].position.set(positionAX, positionAY);
-                    this.changBlock[1].position.set(positionBX, positionBY);
-
-                    this.changBlock.forEach((block: PIXI.Graphics) => {
-                        block.buttonMode = false;
-                        block.interactive = false;
-                        this._app.stage.addChild(block);
-                    })
-
-                    this.cancelTimer2();
-
-                    if(this.changBlock.length>1){
-
-                        this.timer_scale = setInterval(() => {
-                            this.move(this.changBlock[0], this.changBlock[1], positionAX, positionBX, positionAY, positionBY);
-                        });
-                    }
-
-                }
-                */
-                //-----------------
-    
             }
-            // this._board = this._controller.checkNomalBlock( this._board);
+
+            this._board = this._controller.checkNomalBlock(this._board);
+            this.clearBard();
 
             this._lastBlock = undefined;
             this._aim.alpha = 0;
-            this.clearBard();
         }
 
         //------------工具人------------//
@@ -348,9 +291,6 @@ namespace View {
         private cancelTimer(): void {
             clearInterval(this._timer_num);
         }
-        private cancelTimer2(): void {
-            clearInterval(this.timer_scale);
-        }
         private cancelHB(): void {
             clearInterval(this._timerHB_num);
         }
@@ -376,73 +316,8 @@ namespace View {
                 }
             })
         }
-        private move = (A: PIXI.Graphics, B: PIXI.Graphics, Ax: number, Bx: number, Ay: number, By: number): void => {
 
-            let bol: boolean = false;
 
-            if(A&&B){
-                if (Ax < Bx && Ay == By) {
-                    bol = true;
-                    if (B.x == Ax) {
-                        bol = false;
-                        this.changBlock.forEach((e: PIXI.Graphics) => {
-                            this._app.stage.removeChild(e);
-                        });
-                        this.changBlock = [];
-                    }
-                    if (bol) {
-                        B.x -= 1;
-                        A.x += 1;
-                    }
-    
-                } else if (Bx < Ax && Ay == By) {
-                    bol = true;
-                    if (B.x == Ax) {
-                        bol = false;
-                        this.changBlock.forEach((e: PIXI.Graphics) => {
-                            this._app.stage.removeChild(e);
-                        });
-                        this.changBlock = [];
-    
-                    }
-                    if (bol) {
-                        B.x += 1;
-                        A.x -= 1;
-                    }
-    
-                } else if (Ay < By && Ax == Bx) {
-                    bol = true;
-                    if (B.y == Ay) {
-                        bol = false;
-                        this.changBlock.forEach((e: PIXI.Graphics) => {
-                            this._app.stage.removeChild(e);
-                        });
-                        this.changBlock = [];
-    
-                    }
-                    if (bol) {
-                        B.y -= 1;
-                        A.y += 1;
-                    }
-    
-                } else if (By < Ay && Ax == Bx) {
-                    bol = true;
-                    if (B.y == Ay) {
-                        bol = false;
-                        this.changBlock.forEach((e: PIXI.Graphics) => {
-                            this._app.stage.removeChild(e);
-                        });
-                        this.changBlock = [];
-    
-                    }
-                    if (bol) {
-                        B.y += 1;
-                        A.y -= 1;
-                    }
-                }
-    
 
-            }
-        }
     }
 }
