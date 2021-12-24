@@ -14,7 +14,7 @@
 //             super();
 //             this._block = new Block.block();
 //         }
-//         public checkBlock(board: number[][], blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
+//         public a_checkBlock(board: number[][], blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
 //             //把可能性都列出來的
 //             //上下左右各二
 
@@ -250,7 +250,7 @@
 //         }
 
 
-//         public b_checkBlock(board: number[][], blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
+//         public checkBlock(board: number[][], blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
 //             let isRemove: boolean = false
 
 //             let minCombo: number = 3;

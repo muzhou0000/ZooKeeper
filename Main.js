@@ -417,7 +417,7 @@ var Controller;
 //             super();
 //             this._block = new Block.block();
 //         }
-//         public checkBlock(board: number[][], blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
+//         public a_checkBlock(board: number[][], blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
 //             //把可能性都列出來的
 //             //上下左右各二
 //             let isRemove: boolean = false
@@ -608,7 +608,7 @@ var Controller;
 //             this.cul(pointNum);
 //             return isRemove;
 //         }
-//         public b_checkBlock(board: number[][], blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
+//         public checkBlock(board: number[][], blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
 //             let isRemove: boolean = false
 //             let minCombo: number = 3;
 //             let comboH: number = 1;
@@ -782,11 +782,15 @@ var Model;
             super();
             this._block = new Block.block();
         }
-        a_checkBlock(board, blockA, blockB) {
+        checkBlock(board, blockA, blockB) {
+            //只找目前移動的方塊
             //把可能性都列出來的
             //上下左右各二
             let isRemove = false;
             let pointNum = [];
+            for (let i = 0; i < 4; i++) {
+                // console.log(i, i + 1, i + 2);
+            }
             let position = { x: 0, y: 0 };
             if (blockA && blockB) {
                 if (board[blockA.y][blockA.x + 2]) {
@@ -973,8 +977,8 @@ var Model;
             this.cul(pointNum);
             return isRemove;
         }
-        checkBlock(board, blockA, blockB) {
-            //消除的演算法
+        b_checkBlock(board, blockA, blockB) {
+            //全世界都找一遍
             let isRemove = false;
             let pointNum = [];
             let position = { x: 0, y: 0 };

@@ -15,18 +15,23 @@ namespace Model {
             this._block = new Block.block();
         }
 
-        public a_checkBlock(board: number[][], blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
+        public checkBlock(board: number[][], blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
+            //只找目前移動的方塊
             //把可能性都列出來的
             //上下左右各二
 
             let isRemove: boolean = false
             let pointNum: number[] = [];
 
+            for (let i: number = 0; i < 4; i++) {
+                // console.log(i, i + 1, i + 2);
+            }
+
             let position: { x: number, y: number } = { x: 0, y: 0 };
 
             if (blockA && blockB) {
 
-                if (board[blockA.y][blockA.x + 2] ) {
+                if (board[blockA.y][blockA.x + 2]) {
                     if (board[blockA.y][blockA.x] == board[blockA.y][blockA.x + 1] && board[blockA.y][blockA.x] == board[blockA.y][blockA.x + 2]) {
 
                         position = { x: blockA.x, y: blockA.y };
@@ -251,8 +256,8 @@ namespace Model {
         }
 
 
-        public checkBlock(board: number[][],blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
-            //消除的演算法
+        public b_checkBlock(board: number[][], blockA: { x: number, y: number }, blockB: { x: number, y: number }): boolean {
+            //全世界都找一遍
             let isRemove: boolean = false
             let pointNum: number[] = [];
 
